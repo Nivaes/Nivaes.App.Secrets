@@ -1,0 +1,39 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build_benchmark",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+          "build",
+          "${workspaceFolder}/test/Nivaes.IoC.Benchmarks/Nivaes.IoC.Benchmarks.csproj",
+          "--configuration", "Release",
+          "-p:SkipCompTimeGen=true"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+          "kind": "build",
+          "isDefault": true
+      }
+    },
+    {
+      "label": "publish_benchmark",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+          "publish",
+          "${workspaceFolder}/test/Nivaes.IoC.Benchmarks/Nivaes.IoC.Benchmarks.csproj",
+          "--configuration", "Release",
+          "-p:SkipCompTimeGen=true"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+          "kind": "build",
+          "isDefault": true
+      }
+    },
+  ]
+}
