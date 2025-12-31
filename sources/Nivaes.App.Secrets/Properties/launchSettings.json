@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Nivaes.App.Secrets": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "SENTRY_DNS": "http://localhost:8900",
+        "APP_DNS": "http://localhost:9100"
+      }
+    }
+  }
+}
