@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Nivaes.App.Secrets.SourceGenerator;
@@ -10,12 +15,15 @@ namespace Nivaes.App.Secrets.SourceGenerator;
 public class SecretsIncrementalGenerator
     : IIncrementalGenerator
 {
-    public struct Data
+    record struct Data
     {
         public string AssemblyName;
         public string? AppDns;
         public string? SentryDns;
     }
+
+    public SecretsIncrementalGenerator()
+    { }
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -23,26 +31,35 @@ public class SecretsIncrementalGenerator
         System.Diagnostics.Debugger.Launch();
 #endif
 
-        var appNameProvider = context.AnalyzerConfigOptionsProvider
-            .Select((optionsProvider, _) =>
+        var compilationOnce = context.CompilationProvider
+            .Combine(context.AnalyzerConfigOptionsProvider)
+        .Select((pair, _) =>
+        {
+            (Compilation? compilation, AnalyzerConfigOptionsProvider? optionsProvider) = pair;
+            var tree = compilation.SyntaxTrees.First();
+
+            var optionsProviderTree = optionsProvider.GetOptions(tree);
+
+            optionsProvider.GlobalOptions.TryGetValue("build_property.AssemblyName", out var assemblyName);
+
+            optionsProvider.GlobalOptions.TryGetValue("build_property.AppDns", out var buildAppDns);
+            optionsProvider.GlobalOptions.TryGetValue("build_property.SentryDns", out var buildSentryDns);
+
+            optionsProviderTree.TryGetValue("secret_app_dns", out var _editorConfigAppDns);
+            optionsProviderTree.TryGetValue("secret_sentry_dns", out var _editorConfigSentryDns);
+
+            var appDnsEnvironment = Environment.GetEnvironmentVariable("APP_DNS");
+            var sentryDnsEnvironment = Environment.GetEnvironmentVariable("SENTRY_DNS");
+
+            return new Data
             {
-                optionsProvider.GlobalOptions.TryGetValue("build_property.AssemblyName", out var assemblyName);
-                
-                optionsProvider.GlobalOptions.TryGetValue("build_property.AppDns", out var buildAppDns);
-                optionsProvider.GlobalOptions.TryGetValue("build_property.SentryDns", out var buildSentryDns);
-
-                var appDnsEnvironment = Environment.GetEnvironmentVariable("APP_DNS");
-                var sentryDnsEnvironment = Environment.GetEnvironmentVariable("SENTRY_DNS");
-
-                return new Data
-                {
-                    AssemblyName = assemblyName ?? "Nivaes.App.Secretrs",
-                    AppDns = appDnsEnvironment ?? buildAppDns,
-                    SentryDns = sentryDnsEnvironment ?? buildSentryDns
-                };
-            });
-
-        context.RegisterSourceOutput(appNameProvider, (SourceProductionContext spc, Data info) =>
+                AssemblyName = assemblyName ?? "Nivaes.App.Secretrs",
+                AppDns = appDnsEnvironment ?? _editorConfigAppDns ?? buildAppDns,
+                SentryDns = sentryDnsEnvironment ?? _editorConfigSentryDns ?? buildSentryDns
+            };
+        });
+       
+        context.RegisterSourceOutput(compilationOnce, (SourceProductionContext spc, Data info) =>
         {
             if (!string.IsNullOrWhiteSpace(info.AppDns) || !string.IsNullOrWhiteSpace(info.SentryDns))
             {
@@ -65,6 +82,6 @@ public class SecretsIncrementalGenerator
 
                 spc.AddSource("Secrets.g.cs", Microsoft.CodeAnalysis.Text.SourceText.From(source, Encoding.UTF8));
             }
-        });       
+        });
     }
 }
