@@ -27,9 +27,9 @@ public class SecretsIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-#if DEBUG
-        System.Diagnostics.Debugger.Launch();
-#endif
+//#if DEBUG
+//        System.Diagnostics.Debugger.Launch();
+//#endif
 
         var compilationOnce = context.CompilationProvider
             .Combine(context.AnalyzerConfigOptionsProvider)
