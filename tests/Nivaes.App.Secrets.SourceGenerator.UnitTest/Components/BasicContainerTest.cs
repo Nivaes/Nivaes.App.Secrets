@@ -26,27 +26,20 @@ public class BasicContainerTest
     public async Task CanResolveSimpleSingleton()
     {
         var project = await TestProject.Project.ApplyToProgram(@"
-        public partial class TestClass
-        {
-        }
-");
+                public partial class TestClass
+                {
+                }
+        ");
+        var newProject = await project.ApplySecretsGenerator();
 
-        //var newProject = await project.ApplyIoCGenerator();
+        var compilation = await newProject.GetCompilationAsync();
+        compilation.ShouldNotBeNull();
+        var errors = compilation.GetDiagnostics()
+           .Where(o => o.Severity == DiagnosticSeverity.Error)
+           .ToArray();
 
-        //var assembly = await newProject.CompileToRealAssembly();
-        //var containerType = assembly.GetType("TestProject.TestContainer");
-        //containerType.ShouldNotBeNull();
-        //var serviceType = assembly.GetType("TestProject.IService");
-        //serviceType.ShouldNotBeNull();
+        Assert.False(errors.Any(), errors.Select(o => o.GetMessage()).JoinWithNewLine());
 
-        //var container = (IIoCResolver?)Activator.CreateInstance(containerType!);
-        //container.ShouldNotBeNull();
-        //var firstService = container!.Resolve(serviceType!);
-        //firstService.ShouldNotBeNull();
-        //var secondService = container!.Resolve(serviceType!);
-        //secondService.ShouldNotBeNull();
-
-        //firstService.ShouldBe(secondService);
     }
 
 //    [Fact]

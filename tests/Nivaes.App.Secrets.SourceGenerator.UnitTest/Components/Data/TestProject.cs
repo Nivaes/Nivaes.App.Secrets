@@ -12,7 +12,7 @@ public static class TestProject
 using System;
 using Nivaes.App.Secrets;
 
-namespace TestProject 
+namespace TestProject
 {
     // place to replace
 
@@ -50,7 +50,7 @@ namespace TestProject
             MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(ArrayPool<>).Assembly.Location),
-            //MetadataReference.CreateFromFile(typeof(IoCServiceContainer).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(SecretsSerializer).Assembly.Location),
         };
     }
 }

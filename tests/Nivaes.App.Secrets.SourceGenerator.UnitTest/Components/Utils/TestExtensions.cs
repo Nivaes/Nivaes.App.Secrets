@@ -53,7 +53,6 @@ public static class TestExtensions
                 .GeneratedSources
                 .Select(o => new { o.SyntaxTree, o.HintName, }));
 
-
         foreach (var file in results)
         {
             project = project

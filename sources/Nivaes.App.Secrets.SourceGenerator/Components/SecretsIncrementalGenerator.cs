@@ -63,18 +63,30 @@ public class SecretsIncrementalGenerator
         {
             if (!string.IsNullOrWhiteSpace(info.AppDns) || !string.IsNullOrWhiteSpace(info.SentryDns))
             {
+                var secres = new List<string>();
                 StringBuilder sb = new StringBuilder();
+                var n = 0;
+                string readLine = "public static string {0} = SecretsSerializer.Read(_secres, {1});";
                 if (!string.IsNullOrWhiteSpace(info.AppDns))
-                    sb.Append($@"public const string AppDns = ""{info.AppDns}"";");
+                {
+                    secres.Add(info.AppDns);
+                    sb.AppendLine(string.Format(readLine, "AppDns", n++));
+                }
 
                 if (!string.IsNullOrWhiteSpace(info.SentryDns))
-                    sb.Append($@"public const string SentryDns = ""{info.SentryDns}"";");
+                {
+                    secres.Add(info.SentryDns);
+                    sb.AppendLine(string.Format(readLine, "SentryDns", n++));
+                }
 
+                string secresSource = $@"new Lazy<string[]>(() => SecretsSerializer.Deserialize(new byte[] {{ {string.Join(",", SecretsSerializationHelper.Serializer(secres))} }}).ToArray())";
                 var source = $@"
+                    using Nivaes.App.Secrets;
                     namespace {info.AssemblyName}
                     {{
                         public static class Secrets
                         {{
+                            private static Lazy<string[]> _secres = {secresSource};
                             {sb.ToString()}
                         }}
                     }}
