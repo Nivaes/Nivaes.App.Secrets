@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Runtime.Serialization;
-using System.Text;
-using Newtonsoft.Json.Linq;
+﻿using Nivaes.App.Secrets.SourceGenerator;
+using Nivaes.DataTestGenerator.Xunit;
 using Shouldly;
 
 namespace Nivaes.App.Secrets.UnitTest;
@@ -17,54 +13,27 @@ public class SerializerTest
         _output = output;
     }
 
-    private byte[] Serializer(IEnumerable<string> codes)
-    {
-        int totalLength = codes.Sum(x => x.Length) + codes.Count() * 4;
-        var buffer = new byte[totalLength];
-
-        using var ms = new MemoryStream(buffer);
-        using var writer = new BinaryWriter(ms);
-        writer.Write(codes.Count());
-        foreach (var code in codes)
-        {
-            writer.Write(code);
-        }
-
-        return ms.ToArray();
-    }
-
-    private IEnumerable<string> Deserialize(byte[] codes)
-    {
-        using var ms = new MemoryStream(codes);
-        using var reader = new BinaryReader(ms);
-
-        var numberCodes = reader.ReadInt32();
-
-        while(numberCodes-- > 0)
-        {
-            var code = reader.ReadString();
-            yield return code;
-        }
-    }
-
     public class SecretMocks
     {
         public required string Secret1 { get; set; }
         public required string Secret2 { get; set; }
+        public required string Secret3 { get; set; }
     }
 
+
     [Fact]
-    public void ReadSecret()
+    public void Serializa_secris()
     {
         var aa = new Lazy<byte[]>(() => { return new byte[] { 0, 2, 3, 2, 3 }; });
         SecretMocks secrets1 = new SecretMocks()
         {
             Secret1 = "hola",
-            Secret2 = "adios"
+            Secret2 = "adios",
+            Secret3 = "saludos"
         };
-        var codes = Serializer(new[] { secrets1.Secret1, secrets1.Secret2 });
+        var codes = SecretsSerializationHelper.Serializer(new[] { secrets1.Secret1, secrets1.Secret2, secrets1.Secret3 });
 
-        var codes2 = Deserialize(codes).ToArray();
+        var codes2 = SecretsSerializer.Deserialize(codes).ToArray();
 
         _output.WriteLine(string.Join(",", codes));
 
@@ -72,9 +41,41 @@ public class SerializerTest
         {
             Secret1 = codes2[0],
             Secret2 = codes2[1],
+            Secret3 = codes2[2],
         };
 
         secrets1.Secret1.ShouldBe(secrets2.Secret1);
         secrets1.Secret2.ShouldBe(secrets2.Secret2);
+        secrets1.Secret3.ShouldBe(secrets2.Secret3);
+    }
+
+    [Theory]
+    [GenerateStringInlineData(50, MinSize = 50, MaxSize = 1000)]
+    public void Serialize_secret_multi(string secret)
+    {
+        var aa = new Lazy<byte[]>(() => { return new byte[] { 0, 2, 3, 2, 3 }; });
+        SecretMocks secrets1 = new SecretMocks()
+        {
+            Secret1 = "hola",
+            Secret2 = "adios",
+            Secret3 = secret
+        };
+        var codes = SecretsSerializationHelper.Serializer(new[] { secrets1.Secret1, secrets1.Secret2, secrets1.Secret3 });
+
+        var codes2 = SecretsSerializer.Deserialize(codes).ToArray();
+
+        _output.WriteLine(string.Join(",", codes));
+
+        SecretMocks secrets2 = new SecretMocks()
+        {
+            Secret1 = codes2[0],
+            Secret2 = codes2[1],
+            Secret3 = codes2[2],
+        };
+
+        secrets1.Secret1.ShouldBe(secrets2.Secret1);
+        secrets1.Secret2.ShouldBe(secrets2.Secret2);
+        secrets1.Secret3.ShouldBe(secrets2.Secret3);
+        secrets1.Secret3.ShouldBe(secret);
     }
 }

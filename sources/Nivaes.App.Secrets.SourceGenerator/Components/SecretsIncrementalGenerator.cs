@@ -34,8 +34,6 @@ public class SecretsIncrementalGenerator
 
             var optionsProviderTree = optionsProvider.GetOptions(tree);
 
-            optionsProvider.GlobalOptions.TryGetValue("build_property.AssemblyName", out var assemblyName);
-
             optionsProvider.GlobalOptions.TryGetValue("build_property.AppDns", out var buildAppDns);
             optionsProvider.GlobalOptions.TryGetValue("build_property.SentryDns", out var buildSentryDns);
 
@@ -47,7 +45,7 @@ public class SecretsIncrementalGenerator
 
             return new Data
             {
-                AssemblyName = assemblyName ?? "Nivaes.App.Secretrs",
+                AssemblyName = compilation.AssemblyName ?? "Nivaes.App.Secretrs",
                 AppDns = appDnsEnvironment ?? _editorConfigAppDns ?? buildAppDns,
                 SentryDns = sentryDnsEnvironment ?? _editorConfigSentryDns ?? buildSentryDns
             };

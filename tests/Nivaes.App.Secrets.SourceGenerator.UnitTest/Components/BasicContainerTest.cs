@@ -1,10 +1,12 @@
-﻿using Microsoft.CodeAnalysis;
-//using Microsoft.CodeAnalysis.CSharp.Testing;
+﻿using System;
+using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Testing;
 using Shouldly;
 using Xunit;
-//using Verify = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerTest<Nivaes.App.Secrets.SourceGenerator.SecretsIncrementalGenerator>();
-//using Microsoft.CodeAnalysis.Testing;
-//using Microsoft.CodeAnalysis.Testing.Verifiers;
+
 
 namespace Nivaes.App.Secrets.SourceGenerator.UnitTest;
 
@@ -29,26 +31,20 @@ public class BasicContainerTest
     [Fact]
     public async Task Compiles_without_errors()
     {
-        //var test = new CSharpSourceGeneratorTest<
-        //   Nivaes.App.Secrets.SourceGenerator.SecretsIncrementalGenerator,
-        //   XUnitVerifier>();
+        var test = new CSharpSourceGeneratorTest<SecretsIncrementalGenerator, DefaultVerifier>()
+        {
+            TestCode = @"
+                public partial class TestClass
+                {
+                }
+                ",
+        };
 
-
-        //var project = TestProject.Project;
-
-        //var newProject = await project.ApplySecretsGenerator();
-
-        //var compilation = await newProject.GetCompilationAsync();
-        //compilation.ShouldNotBeNull();
-        //var errors = compilation.GetDiagnostics()
-        //    .Where(o => o.Severity == DiagnosticSeverity.Error)
-        //    .ToArray();
-
-        //Assert.False(errors.Any(), errors.Select(o => o.GetMessage()).JoinWithNewLine());
+        await test.RunAsync();
     }
 
     [Fact]
-    public async Task CanResolveSimpleSingleton()
+    public async Task Can_resolve_simple_singleton_Old()
     {
         var project = await TestProject.Project.ApplyToProgram(@"
                 public partial class TestClass
@@ -67,222 +63,56 @@ public class BasicContainerTest
 
     }
 
-//    [Fact]
-//    public async Task CanResolveSimpleTransient()
-//    {
-//        var project = await TestProject.Project.ApplyToProgram(@"
+    //[Fact]
+    //public async Task Can_resolve_simple_singleton()
+    //{
+    //    var test = new CSharpSourceGeneratorTest<SecretsIncrementalGenerator, DefaultVerifier>()
+    //    {
+    //        TestCode = @"
+    //            using Nivaes.App.Secrets;
+    //            public partial class TestClass
+    //            {
+    //            }
+    //            ",
+    //        TestState =
+    //        {
+    //            Sources = { "public partial class TestClass\r\n{\r\n}\r\n "},
+    //            AnalyzerConfigFiles =  {
+    //            ("/.editorconfig", """
+    //                root = true
 
-//        public interface IService
-//        {
+    //                [*]
+    //                build_property.AssemblyName = Nivaes.App1
+    //                secret_app_dns = http://test
+    //                secret_sentry_dns = http://sentry.test
+    //                """)
+    //            },
+    //        },
+    //    };
+    //    test.ReferenceAssemblies = ReferenceAssemblies.Net.Net90;
+    //    //test.ReferenceAssemblies = test.ReferenceAssemblies.AddAssemblies(ImmutableArray.Create(nameof(SecretsSerializer)));
+    //    test.TestState.GeneratedSources.Add((typeof(SecretsIncrementalGenerator), "Secrets.g.cs", """
 
-//        }
+    //                        using Nivaes.App.Secrets;
+    //                        namespace Nivaes.App.Secretrs
+    //                        {
+    //                            public static class Secrets
+    //                            {
+    //                                private static Lazy<string[]> _secres = new Lazy<string[]>(() => SecretsSerializer.Deserialize(new byte[] { 2,0,0,0,11,104,116,116,112,58,47,47,116,101,115,116,18,104,116,116,112,58,47,47,115,101,110,116,114,121,46,116,101,115,116,0,0 }).ToArray());
+    //                                public static string AppDns = SecretsSerializer.Read(_secres, 0);
+    //    public static string SentryDns = SecretsSerializer.Read(_secres, 1);
 
-//        public class Service : IService
-//        {
+    //                            }
+    //                        }
+                            
+    //    """));
+    //    test.TestState.AdditionalReferences.Add(typeof(System.String).Assembly);
+    //    test.TestState.AdditionalReferences.Add(typeof(Lazy<>).Assembly);
+    //    test.TestState.AdditionalReferences.Add(typeof(IEnumerable<>).Assembly);
+    //    test.TestState.AdditionalReferences.Add(typeof(SecretsSerializer).Assembly);
 
-//        }
+    //});
 
-//        public partial class TestContainer : IoCServiceContainer
-//        {
-//            protected override void Bootstrap(IIoCServiceContainerBootstrapper bootstrapper)
-//            {
-//                bootstrapper.AddTransient<IService, Service>();
-//            }
-//        }
-//");
-
-//        var newProject = await project.ApplyIoCGenerator();
-
-//        var assembly = await newProject.CompileToRealAssembly();
-//        var containerType = assembly.GetType("TestProject.TestContainer");
-//        containerType.ShouldNotBeNull();
-        
-//        var serviceType = assembly.GetType("TestProject.IService");
-//        serviceType.ShouldNotBeNull();
-
-//        var container = (IIoCResolver?)Activator.CreateInstance(containerType!);
-//        container.ShouldNotBeNull();
-
-//        var firstService = container!.Resolve(serviceType!);
-//        firstService.ShouldNotBeNull();
-
-//        var secondService = container.Resolve(serviceType!);
-//        secondService.ShouldNotBeNull();
-
-//        firstService.ShouldNotBe(secondService);
-//    }
-
-//    [Fact]
-//    public async Task HandlesMultipleContainersInTheSameTime()
-//    {
-//        var project = await TestProject.Project.ApplyToProgram(@"
-
-//        public interface IService
-//        {
-
-//        }
-
-//        public class Service : IService
-//        {
-
-//        }
-
-//        public partial class TestContainer : IoCServiceContainer
-//        {
-//            protected override void Bootstrap(IIoCServiceContainerBootstrapper bootstrapper)
-//            {
-//                bootstrapper.AddTransient<IService, Service>();
-//            }
-//        }
-
-//        public partial class SingleContainer : IoCServiceContainer
-//        {
-//            protected override void Bootstrap(IIoCServiceContainerBootstrapper bootstrapper)
-//            {
-//                bootstrapper.AddSingleton<IService, Service>();
-//            }
-//        }
-//");
-
-//        var newProject = await project.ApplyIoCGenerator();
-
-//        var assembly = await newProject.CompileToRealAssembly();
-//        var containerType1 = assembly.GetType("TestProject.TestContainer");
-//        var containerType2 = assembly.GetType("TestProject.SingleContainer");
-//        containerType1.ShouldNotBeNull();
-//        containerType2.ShouldNotBeNull();
-
-//        var serviceType = assembly.GetType("TestProject.IService");
-//        serviceType.ShouldNotBeNull();
-
-//        var container1 = (IIoCResolver?)Activator.CreateInstance(containerType1!);
-//        var container2 = (IIoCResolver?)Activator.CreateInstance(containerType2!);
-//        container1.ShouldNotBeNull();
-//        container2.ShouldNotBeNull();
-
-//        var firstService1 = container1!.Resolve(serviceType!);
-//        var secondService1 = container1!.Resolve(serviceType!);
-
-//        var firstService2 = container2!.Resolve(serviceType!);
-//        var secondService2 = container2!.Resolve(serviceType!);
-
-//        Assert.True(!firstService1!.Equals(secondService1));
-//        Assert.True(!firstService1!.Equals(firstService2));
-//        Assert.True(!firstService1!.Equals(secondService2));
-//        Assert.True(firstService2!.Equals(secondService2));
-//    }
-
-//    [Fact]
-//    public async Task SingletonsAreTheSameBetweenScopes()
-//    {
-//        var project = await TestProject.Project.ApplyToProgram(@"
-
-//        public interface IService
-//        {
-
-//        }
-
-//        public class Service : IService
-//        {
-
-//        }
-
-//        public partial class TestContainer : IoCServiceContainer
-//        {
-//            protected override void Bootstrap(IIoCServiceContainerBootstrapper bootstrapper)
-//            {
-//                bootstrapper.AddSingleton<IService, Service>();
-//            }
-//        }
-//");
-
-//        var newProject = await project.ApplyIoCGenerator();
-
-//        var assembly = await newProject.CompileToRealAssembly();
-//        var containerType = assembly.GetType("TestProject.TestContainer");
-//        var serviceType = assembly.GetType("TestProject.IService");
-//        serviceType.ShouldNotBeNull();
-//        var container = (IIoCResolver?)Activator.CreateInstance(containerType!);
-//        container.ShouldNotBeNull();
-//        var firstService = container!.Resolve(serviceType!);
-
-//        var scoped = container.CreateScope();
-//        var secondService = scoped.Resolve(serviceType!);
-
-//        Assert.True(firstService != null && secondService != null && firstService.Equals(secondService));
-//    }
-
-//    [Fact]
-//    public async Task RegisterOnlyImplementation()
-//    {
-//        var project = await TestProject.Project.ApplyToProgram(@"
-
-//        public class Service
-//        {
-//        }
-
-//        public partial class TestContainer : IoCServiceContainer
-//        {
-//            protected override void Bootstrap(IIoCServiceContainerBootstrapper bootstrapper)
-//            {
-//                bootstrapper.AddSingleton<Service>();
-//            }
-//        }
-//");
-
-//        var newProject = await project.ApplyIoCGenerator();
-
-//        var assembly = await newProject.CompileToRealAssembly();
-//        var containerType = assembly.GetType("TestProject.TestContainer");
-//        containerType.ShouldNotBeNull();
-//        var serviceType = assembly.GetType("TestProject.Service");
-//        serviceType.ShouldNotBeNull();
-
-//        var container = (IIoCResolver?)Activator.CreateInstance(containerType!);
-//        container.ShouldNotBeNull();
-//        var service = container!.Resolve(serviceType!);
-
-//        service.ShouldNotBeNull();
-//    }
-
-//    [Fact]
-//    public async Task TypedOnlyAPartOfServiceName()
-//    {
-//        var project = await TestProject.Project.ApplyToProgram(@"
-
-//        public class Service
-//        {
-//        }
-
-//        public partial class TestContainer : IoCServiceContainer
-//        {
-//            protected override void Bootstrap(IIoCServiceContainerBootstrapper bootstrapper)
-//            {
-//                bootstrapper.AddSingleton<Servi>();
-//            }
-//        }
-//");
-
-//        var newProject = await project.ApplyIoCGenerator();
-//        newProject.ShouldNotBeNull();
-//    }
-
-//    [Fact]
-//    public async Task BootstrapMethodIsMissing()
-//    {
-//        var project = await TestProject.Project.ApplyToProgram(@"
-
-//        public class Service
-//        {
-//        }
-
-//        public partial class TestContainer : IoCContainer
-//        {
-           
-//        }
-//");
-
-//        var newProject = await project.ApplyIoCGenerator();
-//        newProject.ShouldNotBeNull();
-//    }
+    //    await test.RunAsync();
+    //}
 }
