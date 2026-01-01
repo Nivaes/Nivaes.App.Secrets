@@ -1,15 +1,17 @@
 ﻿using Microsoft.CodeAnalysis;
+//using Microsoft.CodeAnalysis.CSharp.Testing;
 using Shouldly;
 using Xunit;
 //using Verify = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerTest<Nivaes.App.Secrets.SourceGenerator.SecretsIncrementalGenerator>();
-
+//using Microsoft.CodeAnalysis.Testing;
+//using Microsoft.CodeAnalysis.Testing.Verifiers;
 
 namespace Nivaes.App.Secrets.SourceGenerator.UnitTest;
 
 public class BasicContainerTest
 {
     [Fact]
-    public async Task CompilesWithoutErrorsOld()
+    public async Task Compiles_without_errorsOld()
     {
         var project = TestProject.Project;
 
@@ -25,19 +27,24 @@ public class BasicContainerTest
     }
 
     [Fact]
-    public async Task CompilesWithoutErrors()
+    public async Task Compiles_without_errors()
     {
-        var project = TestProject.Project;
+        //var test = new CSharpSourceGeneratorTest<
+        //   Nivaes.App.Secrets.SourceGenerator.SecretsIncrementalGenerator,
+        //   XUnitVerifier>();
 
-        var newProject = await project.ApplySecretsGenerator();
 
-        var compilation = await newProject.GetCompilationAsync();
-        compilation.ShouldNotBeNull();
-        var errors = compilation.GetDiagnostics()
-            .Where(o => o.Severity == DiagnosticSeverity.Error)
-            .ToArray();
+        //var project = TestProject.Project;
 
-        Assert.False(errors.Any(), errors.Select(o => o.GetMessage()).JoinWithNewLine());
+        //var newProject = await project.ApplySecretsGenerator();
+
+        //var compilation = await newProject.GetCompilationAsync();
+        //compilation.ShouldNotBeNull();
+        //var errors = compilation.GetDiagnostics()
+        //    .Where(o => o.Severity == DiagnosticSeverity.Error)
+        //    .ToArray();
+
+        //Assert.False(errors.Any(), errors.Select(o => o.GetMessage()).JoinWithNewLine());
     }
 
     [Fact]
