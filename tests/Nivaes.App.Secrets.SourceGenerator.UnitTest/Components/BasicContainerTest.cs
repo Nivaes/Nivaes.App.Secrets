@@ -1,11 +1,29 @@
 ﻿using Microsoft.CodeAnalysis;
 using Shouldly;
 using Xunit;
+//using Verify = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerTest<Nivaes.App.Secrets.SourceGenerator.SecretsIncrementalGenerator>();
+
 
 namespace Nivaes.App.Secrets.SourceGenerator.UnitTest;
 
 public class BasicContainerTest
 {
+    [Fact]
+    public async Task CompilesWithoutErrorsOld()
+    {
+        var project = TestProject.Project;
+
+        var newProject = await project.ApplySecretsGenerator();
+
+        var compilation = await newProject.GetCompilationAsync();
+        compilation.ShouldNotBeNull();
+        var errors = compilation.GetDiagnostics()
+            .Where(o => o.Severity == DiagnosticSeverity.Error)
+            .ToArray();
+
+        Assert.False(errors.Any(), errors.Select(o => o.GetMessage()).JoinWithNewLine());
+    }
+
     [Fact]
     public async Task CompilesWithoutErrors()
     {
