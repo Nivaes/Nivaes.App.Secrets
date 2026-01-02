@@ -36,11 +36,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <IsTestProject>$(MSBuildProjectName.Contains('UnitTest'))</IsTestProject>
-    <IsBenchmarksProject>$(MSBuildProjectName.Contains('Benchmarks'))</IsBenchmarksProject>
-    <IsSourceGenerator>$(MSBuildProjectName.Contains('SourceGenerator'))</IsSourceGenerator>
     <GenerateDocumentationFile Condition=" '$(Configuration)' == 'Release' ">true</GenerateDocumentationFile>
-    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' and '$(IsTestProject)' != 'true' and '$(IsBenchmarksProject)' != 'true' and '$(IsSourceGenerator)' != 'true'">true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup>
