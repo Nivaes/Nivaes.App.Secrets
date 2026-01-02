@@ -1,5 +1,5 @@
 <Project>
   <ItemGroup>
-    <PackageVersion Include="Nivaes.App.Secrets" Version="0.1.1" />
+    <PackageVersion Include="Nivaes.App.Secrets" Version="0.1.5" />
   </ItemGroup>
 </Project>
