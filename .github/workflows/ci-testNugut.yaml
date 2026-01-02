@@ -4,9 +4,6 @@ on:
   push:
     paths:
       - 'testNuGet/**' 
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.slnx'
 jobs:
   build:
 
