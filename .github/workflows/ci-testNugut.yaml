@@ -1,0 +1,40 @@
+name: CI-testNugut
+
+on:
+  push:
+    paths:
+      - 'testNuGet/**' 
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.slnx'
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v5
+      with:
+        global-json-file: ./global.json
+        source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+    - name: Restore Dependencies
+      run: |
+          dotnet restore .\Test.NuGet.Secrests\
+
+    - name: Build
+      run: dotnet build .\Test.NuGet.Secrests\ --configuration Release --no-restore
+
+    - name: Publish
+      run: dotnet publish .\Test.NuGet.Secrests\ --configuration Release
