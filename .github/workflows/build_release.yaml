@@ -55,7 +55,7 @@ jobs:
         body: |
           Automatic release generated from GitHub Actions.
         draft: true
-        target_commitish: ${{ github.event.release.ref }}"
+        target_commitish: ${{ github.ref_name }}"
         prerelease: false
         files: |
           ./Artifacts/*.{nupkg,snupkg}
