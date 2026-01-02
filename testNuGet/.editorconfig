@@ -1,0 +1,6 @@
+# top-most EditorConfig file
+root = true
+
+[*.cs]
+secret_app_dns = https://localhost/
+secret_sentry_dns = https://sentry/
