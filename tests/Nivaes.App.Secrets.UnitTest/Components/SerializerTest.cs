@@ -27,9 +27,9 @@ public class SerializerTest
     {
         SecretMocks secrets1 = new SecretMocks()
         {
-            Secret1 = "hola",
-            Secret2 = "adios",
-            Secret3 = "saludos"
+            Secret1 = "http://localhost",
+            Secret2 = "http://localhost:8925",
+            Secret3 = "http://name@localhost?ps=123"
         };
         var codes = SecretsSerializationHelper.Serializer(new[] { secrets1.Secret1, secrets1.Secret2, secrets1.Secret3 });
 
@@ -55,8 +55,8 @@ public class SerializerTest
     {
         SecretMocks secrets1 = new SecretMocks()
         {
-            Secret1 = "hola",
-            Secret2 = "adios",
+            Secret1 = "Holow",
+            Secret2 = "By",
             Secret3 = secret
         };
         var codes = SecretsSerializationHelper.Serializer(new[] { secrets1.Secret1, secrets1.Secret2, secrets1.Secret3 });
