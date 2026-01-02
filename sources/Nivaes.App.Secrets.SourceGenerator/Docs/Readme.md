@@ -1,1 +1,0 @@
-﻿# Nivaes.App.Secrets.SourceGenerator
