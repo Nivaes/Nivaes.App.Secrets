@@ -5,14 +5,15 @@ on:
     branches-ignore:
     - 'release/v**'  
     paths-ignore:
+    - 'testNuGet/**'
     - '**/*.md'
-    - '**/*.sln'
+    - '**/*.slnx'
   pull_request:
-    #types: [opened, synchronize, reopened]
     types: [synchronize]
     paths-ignore:
+    - 'testNuGet/**'
     - '**/*.md'
-    - '**/*.sln'
+    - '**/*.slnx'
 
 jobs:
   build:
