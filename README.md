@@ -9,6 +9,7 @@ Genera variables de entorno dentro de la app, en función de ciertos valores.
 
 Recoge las variables de entorno APP_DNS y SENTRY_DNS.
 
+### Fichero launchSettings.json
 
 Se puede definir un fichero **launchSettings.json**, pero esto solo funcionara al ejecutar el proyecto.
 
