@@ -20,6 +20,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <_CommonTargets>net10.0;net11.0</_CommonTargets>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <NeutralLanguage>en</NeutralLanguage>
     <VersionPrefix>0.0.1</VersionPrefix>
     <VersionSuffix>dev-000</VersionSuffix>
